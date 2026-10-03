@@ -328,6 +328,17 @@ test('batch/batch-prompt.md Signal 16 passes the JD location through a file, nev
   assert.doesNotMatch(batchPrompt, /--posting-location "<JD/, 'the JD-controlled value is never shell-interpolated directly');
 });
 
+test('both Signal 16 prompts annualize only explicit, sufficiently specified compensation periods', () => {
+  for (const path of ['modes/oferta.md', 'batch/batch-prompt.md']) {
+    const prompt = readFile(path);
+    assert.match(prompt, /monthly[\s\S]{0,80}`midpoint × 12`/, `${path} documents monthly-to-annual conversion`);
+    assert.match(prompt, /hourly[\s\S]{0,220}(?:JD states weekly hours|JD's stated weekly hours)/, `${path} requires JD-stated weekly hours for hourly annualization`);
+    assert.match(prompt, /`midpoint × (?:the JD's stated|stated) weekly hours × 52`/, `${path} documents hourly-to-annual conversion`);
+    assert.match(prompt, /never assume a 40-hour week or a 2,080-hour year/, `${path} forbids guessing hourly work schedules`);
+    assert.match(prompt, /missing\/ambiguous period[\s\S]{0,100}(?:not evaluated|annual gross is unknown)/, `${path} skips compensation with an unclear period`);
+  }
+});
+
 // ── #4696 CodeRabbit follow-up finding (second round): a single-quoted
 //    heredoc with a FIXED delimiter is still exploitable — a JD location
 //    containing a line identical to the delimiter closes the heredoc early
