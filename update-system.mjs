@@ -300,7 +300,6 @@ const SYSTEM_PATHS = [
   'tracker-aliases.json',
   'session-activity.mjs',
   'set-status.mjs',
-  'set-status-tests.mjs',
   'mark-pdf-ready.mjs',
   'normalize-statuses.mjs',
   'cv-sync-check.mjs',
@@ -335,6 +334,36 @@ const SYSTEM_PATHS = [
   'data-static/',
   'seeds/',
   'tests/',
+
+  // ── Retired paths ─────────────────────────────────────────────────────────
+  // These files no longer exist upstream: #3765 moved four root suites into
+  // tests/ (tracker-columns-tests.mjs stayed, for its timeout). They
+  // stay in the manifest anyway, because SYSTEM_PATHS is what `apply()` prunes
+  // AGAINST — `staleSystemFiles` (see pathMatchesManifest) only deletes a local
+  // file that is gone from the remote tree AND matches an entry here. Drop the
+  // entry and an upgrading install keeps its copy of the old root file forever,
+  // where tests/root-tests-registration.test.mjs then reports it as an
+  // unregistered suite and turns `node test-all.mjs` red on a healthy install.
+  //
+  // Probe on this list vs. the pre-#3765 one, with a local tree holding the
+  // four and a remote tree without them: without these entries the prune
+  // returns nothing at all; with them it returns all four.
+  //
+  // NB: keep square brackets out of every comment in this array. Several
+  // assertions in test-all.mjs extract the manifest with a NON-GREEDY regex
+  // that ends at the first closing bracket, so one inside a comment truncates
+  // the parsed list and every entry below it reads as missing. That is not
+  // hypothetical: the first draft of this block wrote the probe result as an
+  // empty-array literal and turned the check-table-freshness assertion red.
+  //
+  // They are therefore expected to be ABSENT from the working tree, which is
+  // why updater-migration-tests.mjs lists them in ALLOWED_MISSING_ENTRIES.
+  // Safe to delete once no supported install can still be carrying them.
+  'agent-inbox-tests.mjs',
+  'followup-seed-tests.mjs',
+  'paste-reply-tests.mjs',
+  'set-status-tests.mjs',
+  // ── end retired paths ─────────────────────────────────────────────────────
   'user-agent.mjs',
   'doctor.mjs',
   'jsonc-parse.mjs',
@@ -375,7 +404,6 @@ const SYSTEM_PATHS = [
   'invite-match.mjs',
   'agent-inbox.mjs',
   'followup-seed.mjs',
-  'followup-seed-tests.mjs',
   'profile-language.mjs',
   'title-keywords.mjs',
   'gemini-eval.mjs',
@@ -389,7 +417,6 @@ const SYSTEM_PATHS = [
   'test-all.mjs',
   'tracker-columns-tests.mjs',
   'tracker-writer-lock-tests.mjs',
-  'agent-inbox-tests.mjs',
   'validate-portals.mjs',
   'validate-profile.mjs',
   'verify-portals.mjs',
@@ -401,7 +428,6 @@ const SYSTEM_PATHS = [
   'reply-matcher.mjs',
   'reply-watch.mjs',
   'paste-reply.mjs',
-  'paste-reply-tests.mjs',
   'contact-extract.mjs',
   // Retired 2026-10-04: the suite moved to tests/contact-extract.test.mjs. The
   // entry stays so staleSystemFiles() prunes the orphan on an upgraded install;
@@ -550,7 +576,7 @@ const BOOTSTRAP_PATHS = [
   'validate-plugin-registry.mjs',
   'config/plugins.example.yml',
   'agent-inbox.mjs',
-  'agent-inbox-tests.mjs',
+  'tests/agent-inbox.test.mjs',
 ];
 
 // User layer paths — NEVER touch these (safety check)
